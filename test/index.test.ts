@@ -9,6 +9,7 @@ import IDB from '../src/idb'
 jest.mock('../src/idb')
 
 describe('keystore', () => {
+
   describe('init', () => {
     describe('ecc enabled', () => {
 
@@ -29,6 +30,18 @@ describe('keystore', () => {
         expect(resp).toStrictEqual(rsaKeystore)
       })
     })
+
+
+
+
+    describe('getKeypair', async () => {
+      const ks = await KeyStore.init()
+      const keypair = await ks.getKeypair()
+    })
+
+
+
+
 
     describe('ecc not enabled', () => {
 
