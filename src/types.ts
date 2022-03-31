@@ -1,3 +1,6 @@
+import { SupportedEncodings } from "uint8arrays/util/bases"
+type Encodings = SupportedEncodings
+
 export type Msg = ArrayBuffer | string | Uint8Array
 
 export type CipherText = ArrayBuffer
@@ -81,6 +84,8 @@ export interface KeyStore {
   deleteKey(keyName: string): Promise<void>
   destroy(): Promise<void>
 
+  getKeypair(): Promise<Keypair | null>
+
   // Symmetric
 
   importSymmKey(
@@ -135,3 +140,25 @@ export interface KeyStore {
   publicExchangeKey(): Promise<string>
   publicWriteKey(): Promise<string>
 }
+
+export interface Keypair {
+  publicKey: Uint8Array
+  did(): string,
+  keyType: KeyType
+  sign: (msg: Uint8Array) => Promise<Uint8Array>
+  publicKeyStr: (encoding: Encodings) => string
+}
+
+export interface Didable {
+  publicKeyStr: (format?: Encodings) => string
+  did: () => string
+}
+
+// export type KeyType = 'rsa' | 'ed25519' | 'bls12-381' | 'p256'
+export type KeyType =
+  | "rsa"
+  | "p256"
+  | "p384"
+  | "p521"
+  | "ed25519"
+  | "bls12-381"
