@@ -6473,15 +6473,6 @@
   "resolved" "https://registry.npmjs.org/typescript/-/typescript-4.4.3.tgz"
   "version" "4.4.3"
 
-"ucans@github:ucan-wg/ts-ucan":
-  "resolved" "git+ssh://git@github.com/ucan-wg/ts-ucan.git#978dfd28299d370daee3902ca874a582f48176ff"
-  "version" "0.8.0"
-  dependencies:
-    "@stablelib/ed25519" "^1.0.2"
-    "one-webcrypto" "^1.0.1"
-    "semver" "^7.3.5"
-    "uint8arrays" "^3.0.0"
-
 "uint8arrays@^3.0.0":
   "integrity" "sha512-HRCx0q6O9Bfbp+HHSfQQKD7wU70+lydKVt4EghkdOvlK/NlrF90z+eXV34mUd48rNvVJXwkrMSPpCATkct8fJA=="
   "resolved" "https://registry.npmjs.org/uint8arrays/-/uint8arrays-3.0.0.tgz"

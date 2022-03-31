@@ -13,6 +13,8 @@ test('get keypair', async t => {
   var sig = await kp.sign(uint8arrays.fromString('my message'))
   t.ok(sig, 'should sign a message')
 
+  t.ok(kp.did().includes('did:key'), 'should return a did')
+
   var isValid = await ks.verify('my message', uint8arrays.toString(sig),
     kp.publicKeyStr())
 
