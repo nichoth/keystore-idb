@@ -9,7 +9,6 @@ import KeyStoreBase from '../keystore/base.js'
 import { Keypair, KeyStore, Config, KeyUse, CryptoSystem,
   PrivateKey, KeyType } from '../types.js'
 import * as uint8arrays from "uint8arrays"
-// import { , Didable } from '../types.js'
 
 
 export class ECCKeyStore extends KeyStoreBase implements KeyStore {
