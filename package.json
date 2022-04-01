@@ -50,7 +50,7 @@
     "build": "tsc && yarn run build:minified",
     "build:minified": "node scripts/build-minified.js",
     "start": "tsc -w",
-    "test": "jest --coverage",
+    "test": "jest --coverage && npm run test-tape",
     "test:watch": "jest --coverage --watch",
     "test:prod": "npm run lint && npm run test -- --no-cache",
     "test-tape": "browserify -p esmify test/tape/*.js | tape-run | tap-arc",

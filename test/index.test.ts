@@ -32,17 +32,6 @@ describe('keystore', () => {
     })
 
 
-
-
-    describe('getKeypair', async () => {
-      const ks = await KeyStore.init()
-      const keypair = await ks.getKeypair()
-    })
-
-
-
-
-
     describe('ecc not enabled', () => {
 
       beforeEach(async () => {
