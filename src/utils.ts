@@ -2,6 +2,65 @@ import { webcrypto } from 'one-webcrypto'
 import * as uint8arrays from 'uint8arrays'
 import errors from './errors.js'
 import { CharSize, Msg } from './types.js'
+import { KeyType } from './types.js'
+
+/** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L94 */
+const EDWARDS_DID_PREFIX = new Uint8Array([0xed, 0x01])
+/** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L91 */
+const BLS_DID_PREFIX = new Uint8Array([0xea, 0x01])
+/** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L141 */
+const P256_DID_PREFIX = new Uint8Array([0x80, 0x24])
+/** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L142 */
+const P384_DID_PREFIX = new Uint8Array([0x81, 0x24])
+/** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L143 */
+const P521_DID_PREFIX = new Uint8Array([0x82, 0x24])
+/** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L146 */
+const RSA_DID_PREFIX = new Uint8Array([0x85, 0x24])
+/** Old RSA DID prefix, used pre-standardisation */
+// const RSA_DID_PREFIX_OLD = new Uint8Array([0x00, 0xf5, 0x02])
+
+
+const BASE58_DID_PREFIX = "did:key:z"
+
+/**
+ * Convert a public key in bytes to a DID (did:key).
+ */
+export function publicKeyBytesToDid(
+  publicKeyBytes: Uint8Array,
+  type: KeyType,
+): string {
+  // Prefix public-write key
+  const prefix = magicBytes(type)
+  if (prefix === null) {
+    throw new Error(`Key type '${type}' not supported`)
+  }
+
+  const prefixedBytes = uint8arrays.concat([prefix, publicKeyBytes])
+
+  // Encode prefixed
+  return BASE58_DID_PREFIX + uint8arrays.toString(prefixedBytes, "base58btc")
+}
+
+
+
+export function magicBytes(keyType: KeyType): Uint8Array | null {
+  switch (keyType) {
+    case "ed25519":
+      return EDWARDS_DID_PREFIX
+    case "p256":
+      return P256_DID_PREFIX
+    case "p384":
+      return P384_DID_PREFIX
+    case "p521":
+      return P521_DID_PREFIX
+    case "rsa":
+      return RSA_DID_PREFIX
+    case "bls12-381":
+      return BLS_DID_PREFIX
+    default:
+      return null
+  }
+}
 
 
 export function arrBufToStr(buf: ArrayBuffer, charSize: CharSize): string {
