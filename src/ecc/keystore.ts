@@ -120,7 +120,7 @@ export class ECCKeyStore extends KeyStoreBase implements KeyStore {
   
     return {
       publicKey: uint8arrays.fromString(publicKey, "base64pad"),
-      keyType: keyTypeFromSystem(ksAlg),
+      keyType: 'ed25519', //keyTypeFromSystem(ksAlg),
 
       publicKeyStr: function (encoding: Encodings = "base64pad"): string {
         return uint8arrays.toString(pubKeyBytes, encoding)
