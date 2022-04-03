@@ -29,6 +29,9 @@ export function publicKeyBytesToDid(
   publicKeyBytes: Uint8Array,
   type: KeyType,
 ): string {
+
+  console.log('bbbbbbbbbbbbbbbb', publicKeyBytes, type)
+
   // Prefix public-write key
   const prefix = magicBytes(type)
   if (prefix === null) {

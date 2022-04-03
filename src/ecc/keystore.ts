@@ -7,9 +7,11 @@ import config from '../config.js'
 import utils from '../utils.js'
 import KeyStoreBase from '../keystore/base.js'
 import { Keypair, KeyStore, Config, KeyUse, CryptoSystem,
-  PrivateKey, KeyType } from '../types.js'
+  PrivateKey, /*KeyType*/ } from '../types.js'
 import * as uint8arrays from "uint8arrays"
-import { publicKeyBytesToDid } from "../utils.js"
+// import { publicKeyBytesToDid } from "../utils.js"
+// import ucan from 'ucans'
+import * as ucan from 'ucans'
 
 
 export class ECCKeyStore extends KeyStoreBase implements KeyStore {
@@ -115,27 +117,32 @@ export class ECCKeyStore extends KeyStoreBase implements KeyStore {
 
   async getKeypair (): Promise<Keypair | null> {
     const publicKey = await this.publicWriteKey()
-    const ksAlg = this.getAlg()
-    const pubKeyBytes = uint8arrays.fromString(publicKey, "base64pad")
+    // const ksAlg = this.getAlg()
+    const pubKeyBytes = uint8arrays.fromString(publicKey, 'base64pad')
   
     return {
-      publicKey: uint8arrays.fromString(publicKey, "base64pad"),
+      // publicKey: uint8arrays.fromString(publicKey, 'base64pad'),
+      publicKey: pubKeyBytes,
       keyType: 'ed25519', //keyTypeFromSystem(ksAlg),
 
-      publicKeyStr: function (encoding: Encodings = "base64pad"): string {
-        return uint8arrays.toString(pubKeyBytes, encoding)
+      publicKeyStr: function (/*encoding: Encodings = 'base64pad'*/): string {
+        return publicKey
+        // return uint8arrays.toString(pubKeyBytes, 'base64pad')
       },
 
       did(): string {
-        return publicKeyBytesToDid(pubKeyBytes, keyTypeFromSystem(ksAlg))
+        // return publicKeyBytesToDid(pubKeyBytes, keyTypeFromSystem(ksAlg))
+        // console.log('ccccccccccccccccccccc', pubKeyBytes)
+        // return publicKeyBytesToDid(pubKeyBytes, 'ed25519')
+        return ucan.publicKeyBytesToDid(pubKeyBytes, 'ed25519')
       },
 
       sign: async (msg: Uint8Array): Promise<Uint8Array> => {
-        const msgString = uint8arrays.toString(msg, "utf8")
+        const msgString = uint8arrays.toString(msg, 'utf8')
         // Sign with the private write key:
         // https://github.com/fission-suite/keystore-idb/blob/c1cf7c42a525500b2874e0715f1ff87997337901/src/rsa/keystore.ts#L31
         const signedString = await this.sign(msgString)
-        return uint8arrays.fromString(signedString, "utf8")
+        return uint8arrays.fromString(signedString, 'utf8')
       }
     }
   }
@@ -197,68 +204,68 @@ export default ECCKeyStore
 
 
 
-/**
- * Translate a `CryptoSystem` from the keystore-idb library
- * to a `KeyType` from the ucans library.
- *
- * @param system The `CryptoSystem` we want to translate
- */
-export function keyTypeFromSystem(system: CryptoSystem, curve?: NamedCurve): KeyType {
-  return 'p256'
-  // switch (system) {
-  //   case "ecc":
-  //     switch (curve) {
-  //       // TODO: Next ucans release
-  //       // case "P-256":
-  //       //   return "p256"
-  //       // case "P-384":
-  //       //   return "p384"
-  //       // case "P-521":
-  //       //   return "p521"
-  //       default:
-  //         if (!curve) throw new Error("Missing `curve` parameter (necessary for `ecc`)")
-  //         throw new Error("Invalid `curve` (not supported by keystore-idb)")
-  //     }
+// /**
+//  * Translate a `CryptoSystem` from the keystore-idb library
+//  * to a `KeyType` from the ucans library.
+//  *
+//  * @param system The `CryptoSystem` we want to translate
+//  */
+// function keyTypeFromSystem(system: CryptoSystem, curve?: NamedCurve): KeyType {
+//   return 'p256'
+//   // switch (system) {
+//   //   case "ecc":
+//   //     switch (curve) {
+//   //       // TODO: Next ucans release
+//   //       // case "P-256":
+//   //       //   return "p256"
+//   //       // case "P-384":
+//   //       //   return "p384"
+//   //       // case "P-521":
+//   //       //   return "p521"
+//   //       default:
+//   //         if (!curve) throw new Error("Missing `curve` parameter (necessary for `ecc`)")
+//   //         throw new Error("Invalid `curve` (not supported by keystore-idb)")
+//   //     }
 
-  //   // case "rsa":
-  //   //   return "rsa"
+//   //   // case "rsa":
+//   //   //   return "rsa"
 
-  //   default:
-  //     throw new Error("Invalid `CryptoSystem`")
-  // }
-}
-
-
-// /** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L94 */
-// const EDWARDS_DID_PREFIX = new Uint8Array([0xed, 0x01])
-// /** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L91 */
-// const BLS_DID_PREFIX = new Uint8Array([0xea, 0x01])
-// /** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L141 */
-// const P256_DID_PREFIX = new Uint8Array([0x80, 0x24])
-// /** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L142 */
-// const P384_DID_PREFIX = new Uint8Array([0x81, 0x24])
-// /** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L143 */
-// const P521_DID_PREFIX = new Uint8Array([0x82, 0x24])
-// /** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L146 */
-// const RSA_DID_PREFIX = new Uint8Array([0x85, 0x24])
-// /** Old RSA DID prefix, used pre-standardisation */
-// const RSA_DID_PREFIX_OLD = new Uint8Array([0x00, 0xf5, 0x02])
-
-// function magicBytes(keyType: KeyType): Uint8Array | null {
-//   switch (keyType) {
-//     case "ed25519":
-//       return EDWARDS_DID_PREFIX
-//     case "p256":
-//       return P256_DID_PREFIX
-//     case "p384":
-//       return P384_DID_PREFIX
-//     case "p521":
-//       return P521_DID_PREFIX
-//     case "rsa":
-//       return RSA_DID_PREFIX
-//     case "bls12-381":
-//       return BLS_DID_PREFIX
-//     default:
-//       return null
-//   }
+//   //   default:
+//   //     throw new Error("Invalid `CryptoSystem`")
+//   // }
 // }
+
+
+// // /** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L94 */
+// // const EDWARDS_DID_PREFIX = new Uint8Array([0xed, 0x01])
+// // /** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L91 */
+// // const BLS_DID_PREFIX = new Uint8Array([0xea, 0x01])
+// // /** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L141 */
+// // const P256_DID_PREFIX = new Uint8Array([0x80, 0x24])
+// // /** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L142 */
+// // const P384_DID_PREFIX = new Uint8Array([0x81, 0x24])
+// // /** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L143 */
+// // const P521_DID_PREFIX = new Uint8Array([0x82, 0x24])
+// // /** https://github.com/multiformats/multicodec/blob/e9ecf587558964715054a0afcc01f7ace220952c/table.csv#L146 */
+// // const RSA_DID_PREFIX = new Uint8Array([0x85, 0x24])
+// // /** Old RSA DID prefix, used pre-standardisation */
+// // const RSA_DID_PREFIX_OLD = new Uint8Array([0x00, 0xf5, 0x02])
+
+// // function magicBytes(keyType: KeyType): Uint8Array | null {
+// //   switch (keyType) {
+// //     case "ed25519":
+// //       return EDWARDS_DID_PREFIX
+// //     case "p256":
+// //       return P256_DID_PREFIX
+// //     case "p384":
+// //       return P384_DID_PREFIX
+// //     case "p521":
+// //       return P521_DID_PREFIX
+// //     case "rsa":
+// //       return RSA_DID_PREFIX
+// //     case "bls12-381":
+// //       return BLS_DID_PREFIX
+// //     default:
+// //       return null
+// //   }
+// // }
